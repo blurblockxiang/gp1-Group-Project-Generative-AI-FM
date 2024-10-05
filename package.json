@@ -1,0 +1,16 @@
+{
+  "name": "gp1-group-project-generative-ai-fm",
+  "version": "1.0.0",
+  "description": "Financial updates chatbot and utilities",
+  "main": "app.js",  
+  "scripts": {
+    "start": "node app.js"  
+  },
+  "dependencies": {
+    "express": "^4.18.2",  
+    "jquery": "^3.6.0"
+  },
+  "engines": {
+    "node": ">=14.0.0" 
+  }
+}

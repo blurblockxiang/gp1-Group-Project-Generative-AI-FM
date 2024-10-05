@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <title>Financial Updates Chatbot</title>
+</head>
+<body>
+    <section class="section">
+        <div class="container">
+            <h1 class="title">Financial Updates Chatbot</h1>
+
+            <!-- Stock Price Alert Section -->
+            <div class="box">
+                <h2 class="subtitle">Set Stock Price Alert</h2>
+                <form id="alert-form">
+                    <div class="field">
+                        <label class="label">Stock Symbol</label>
+                        <div class="control">
+                            <input class="input" type="text" id="symbol" placeholder="Enter stock symbol">
+                        </div>
+                    </div>
+                    <div class="field">
+                        <label class="label">Threshold Price</label>
+                        <div class="control">
+                            <input class="input" type="number" id="threshold_price" placeholder="Enter threshold price">
+                        </div>
+                    </div>
+                    <div class="field">
+                        <label class="label">Phone Number</label>
+                        <div class="control">
+                            <input class="input" type="tel" id="user_phone" placeholder="Enter phone number">
+                        </div>
+                    </div>
+                    <div class="control">
+                        <button class="button is-primary" type="submit">Set Alert</button>
+                    </div>
+                </form>
+                <div id="alert-result" class="notification is-hidden"></div>
+            </div>
+
+            <!-- Financial News Section -->
+            <div class="box">
+                <h2 class="subtitle">Get Financial News</h2>
+                <button id="get-news" class="button is-link">Get Latest News</button>
+                <div id="news-result" class="content"></div>
+            </div>
+
+            <!-- Search Financial Information Section -->
+            <div class="box">
+                <h2 class="subtitle">Search Financial Information</h2>
+                <form id="search-form">
+                    <div class="field">
+                        <label class="label">Search Keyword</label>
+                        <div class="control">
+                            <input class="input" type="text" id="search-query" placeholder="Enter keyword (e.g., stock name, news topic)">
+                        </div>
+                    </div>
+                    <div class="control">
+                        <button class="button is-primary" type="submit">Search</button>
+                    </div>
+                </form>
+                <div id="search-result" class="content"></div>
+            </div>
+
+            <!-- Portfolio Summary Section -->
+            <div class="box">
+                <h2 class="subtitle">Get Portfolio Summary</h2>
+                <button id="get-portfolio" class="button is-warning">Get Portfolio Summary</button>
+                <div id="portfolio-result" class="content"></div>
+            </div>
+
+            <!-- Market Trends Section -->
+            <div class="box">
+                <h2 class="subtitle">Market Trend Analysis</h2>
+                <button id="get-trends" class="button is-info">Get Market Trends</button>
+                <div id="trends-result" class="content"></div>
+            </div>
+
+            <!-- Button to return to the home page -->
+            <form action="{{ url_for('index') }}" method="GET">
+                <input type="submit" class="button is-primary" value="Return to Home">
+            </form>
+        </div>
+    </section>
+
+    <script>
+        $(document).ready(function() {
+            // Set Alert form submission
+            $('#alert-form').on('submit', function(event) {
+                event.preventDefault();
+                const symbol = $('#symbol').val();
+                const threshold_price = $('#threshold_price').val();
+                const user_phone = $('#user_phone').val();
+
+                $.ajax({
+                    url: '/set_alert',
+                    method: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify({
+                        symbol: symbol,
+                        threshold_price: threshold_price,
+                        user_phone: user_phone
+                    }),
+                    success: function(response) {
+                        $('#alert-result').removeClass('is-hidden').addClass('is-success').text(response.message);
+                    },
+                    error: function(error) {
+                        $('#alert-result').removeClass('is-hidden').addClass('is-danger').text('Failed to set alert.');
+                    }
+                });
+            });
+
+            // Get Financial News
+            $('#get-news').on('click', function() {
+                $.ajax({
+                    url: '/get_news',
+                    method: 'GET',
+                    success: function(response) {
+                        const articles = response.articles;
+                        let newsHtml = '<ul>';
+                        articles.forEach(article => {
+                            newsHtml += `<li><a href="${article.url}" target="_blank">${article.title}</a></li>`;
+                        });
+                        newsHtml += '</ul>';
+                        $('#news-result').html(newsHtml);
+                    },
+                    error: function(error) {
+                        $('#news-result').html('<p class="has-text-danger">Failed to fetch news.</p>');
+                    }
+                });
+            });
+
+            // Search Financial Information
+            $('#search-form').on('submit', function(event) {
+                event.preventDefault();
+                const query = $('#search-query').val();
+
+                $.ajax({
+                    url: '/search_financial',
+                    method: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify({
+                        query: query
+                    }),
+                    success: function(response) {
+                        let searchHtml = '<ul>';
+                        response.results.forEach(result => {
+                            searchHtml += `<li><a href="${result.url}" target="_blank">${result.title}</a></li>`;
+                        });
+                        searchHtml += '</ul>';
+                        $('#search-result').html(searchHtml);
+                    },
+                    error: function(error) {
+                        $('#search-result').html('<p class="has-text-danger">Failed to fetch search results.</p>');
+                    }
+                });
+            });
+
+            // Get Portfolio Summary
+            $('#get-portfolio').on('click', function() {
+                $.ajax({
+                    url: '/get_portfolio',
+                    method: 'GET',
+                    success: function(response) {
+                        $('#portfolio-result').html(`<p>Portfolio Value: $${response.portfolio_value}</p>`);
+                    },
+                    error: function(error) {
+                        $('#portfolio-result').html('<p class="has-text-danger">Failed to fetch portfolio summary.</p>');
+                    }
+                });
+            });
+
+            // Get Market Trends
+            $('#get-trends').on('click', function() {
+                $.ajax({
+                    url: '/get_market_trends',
+                    method: 'GET',
+                    success: function(response) {
+                        let trendsHtml = '<ul>';
+                        response.trends.forEach(trend => {
+                            trendsHtml += `<li>${trend}</li>`;
+                        });
+                        trendsHtml += '</ul>';
+                        $('#trends-result').html(trendsHtml);
+                    },
+                    error: function(error) {
+                        $('#trends-result').html('<p class="has-text-danger">Failed to fetch market trends.</p>');
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <link rel="stylesheet" href="{{url_for('static',filename='styles.css')}}">
+</head>
+<body>
+    <div class="container">
+        <h2>Insight Advisor</h2>
+        <form action="/insight_advisor" method="post">
+            <input type="submit" value="Insight Advisor">
+        </form>
+        <form action="/financial_news" method="post">
+            <input type="submit" value="Financial News">
+        </form>
+        <form action="/live_chat" method="post">
+            <input type="submit" value="Live Chat">
+        </form>
+        <form action="/submit_feedback" method="post">
+            <input type="submit" value="Feedback">
+        </form>
+        <form action="/sentiment_analysis_result" method="GET">
+            <input type="submit" value="Sentiment Analysis Result">
+        </form>
+    </div>
+</body>
+</html>

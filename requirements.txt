@@ -3,3 +3,4 @@ gunicorn
 google.generativeai
 numpy
 textblob
+Flask-SQLAlchemy
